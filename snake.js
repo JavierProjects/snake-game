@@ -1,3 +1,6 @@
+// import functions
+import { changeDirection } from './changeDirection.js';
+
 // Define the canvas and its rendering context
 const canvas = document.getElementById("gameCanvas");
 const pushButton = document.getElementById("pushButton");
@@ -23,42 +26,14 @@ let velocity = { x: 1, y: 0 };
 // Define the position of the fruit
 let fruit = { x: 10, y: 10 };
 
+let score = 0;
+
 // Handle keyboard input
-document.addEventListener("keydown", changeDirection);
+document.addEventListener("keydown", (event) => changeDirection(event, velocity));
 pushButton.addEventListener("click", function() {
   console.log("Push");
 });
 
-function changeDirection(event) {
-
-  console.log(event);
-  console.log(event.keyCode);
-  console.log(event.key);
-  
-
-const LEFT_KEY = 37;
-const RIGHT_KEY = 39;
-const UP_KEY = 38;
-const DOWN_KEY = 40;
-
-const keyPressed = event.keyCode;
-
-if (keyPressed === LEFT_KEY && velocity.x !== 1) {
-  velocity = { x: -1, y: 0 };
-}
-
-if (keyPressed === RIGHT_KEY && velocity.x !== -1) {
-  velocity = { x: 1, y: 0 };
-}
-
-if (keyPressed === UP_KEY && velocity.y !== 1) {
-  velocity = { x: 0, y: -1 };
-}
-
-if (keyPressed === DOWN_KEY && velocity.y !== -1) {
-  velocity = { x: 0, y: 1 };
-}
-}
 
 // Update the game state
 function update() {
@@ -77,21 +52,22 @@ function update() {
     return;
   }
 
-  // Check for collisions with the fruit
-  if (head.x === fruit.x && head.y === fruit.y) {
-    // Increase the score
-    // Generate new fruit position
-    // Don't remove the tail segment
-  } else {
-    snake.pop();
-  }
-
   // Check for collisions with the snake's body
   for (let i = 1; i < snake.length; i++) {
     if (snake[i].x === head.x && snake[i].y === head.y) {
       gameOver();
       return;
     }
+  }
+
+  // Check for collisions with the fruit
+  if (head.x === fruit.x && head.y === fruit.y) {
+    // Increase the score
+    score += 1;
+    // Generate new fruit position
+    // Don't remove the tail segment
+  } else {
+    snake.pop();
   }
 }
 
@@ -124,7 +100,18 @@ function draw() {
 // Game over logic
 function gameOver() {
   // Display game over message and score
+  
+  // Create a game over element
+  const gameOverElement = document.createElement("div");
+  gameOverElement.classList.add("game-over");
+  gameOverElement.textContent = `Game Over! Your score: ${score}`;
+
+  // Append the game over element to the page
+  document.body.appendChild(gameOverElement);
+  
   // Reset the game state
+  resetGame() 
+
 }
 
 // Game loop
@@ -133,9 +120,28 @@ function gameLoop() {
   draw();
 }
 
+function resetGame() {
+  // Reset the snake
+  snake = [
+    { x: 5, y: 5 },
+    { x: 4, y: 5 },
+    { x: 3, y: 5 },
+    { x: 2, y: 5 },
+    { x: 1, y: 5 },
+    { x: 0, y: 5 }
+  ];
+
+  // Reset the fruit
+  fruit = { x: 10, y: 10 };
+
+  // Reset the velocity
+  velocity = { x: 1, y: 0 };
+
+  score = 0;
+}
 // Start the game loop
-// setInterval(gameLoop, 100);
-gameLoop();
+setInterval(gameLoop, 100);
+// gameLoop();
 
 
 
